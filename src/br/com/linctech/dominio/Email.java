@@ -1,8 +1,11 @@
 package br.com.linctech.dominio;
 
+import java.io.Serializable;
+
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
-public class Email {
+public class Email implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String enderecoEletronino;
 
     public Email() {

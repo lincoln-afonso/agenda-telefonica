@@ -3,27 +3,24 @@ package br.com.linctech.dominio;
 import java.util.Set;
 
 public interface InclusaoDeDados {
-    /**
-     * System.out.println("MENU"); System.out.println(" 1 - Incluir o nome de uma
-     * pessoa"); System.out.println(" 2 - Incluir um telefone");
-     * System.out.println(" 3 - Incluir um email"); System.out.println(" 4 -
-     * Consular os dados de uma pessoa a partir do nome"); System.out.println(" 5 -
-     * Excluir uma pessoa pelo nome"); System.out.println(" 6 - Excluir um
-     * telefone"); System.out.println(" 7 - Excluir um email"); System.out.println("
-     * 8 - Encerrar\n");
-     */
 
-    public abstract boolean cadastrarNome(Set<Pessoa> pessoas);
+    public abstract boolean cadastrarNome(Agenda agenda);
 
-    public abstract boolean cadastrarTelefone(Set<Pessoa> pessoas);
+    public abstract boolean cadastrarTelefone(Agenda agenda);
 
-    public abstract boolean cadastrarEmail(Set<Email> emails);
+    public abstract boolean cadastrarEmail(Agenda agenda);
 
-    public abstract boolean consultarDadas(Set<Pessoa> pessoas);
+    public abstract Pessoa pesquisarNome(Set<Pessoa> pessoas, String nome);
 
-    public abstract boolean excluirPessoa(Set<Pessoa> pessoas);
+    public abstract Email pesquisarEmail(Set<Email> emails, String email);
 
-    public abstract boolean excluirTelefone(Set<Pessoa> pessoas);
+    public abstract Telefone pesquisarTelefone(Set<Telefone> telefones, String telefone);
 
-    public abstract boolean excluirEmail(Set<Pessoa> pessoas);
+    public abstract boolean consultarDados(Agenda agenda);
+
+    public abstract boolean excluirPessoa(Agenda agenda);
+
+    public abstract boolean excluirTelefone(Agenda agenda);
+
+    public abstract boolean excluirEmail(Agenda agenda);
 }

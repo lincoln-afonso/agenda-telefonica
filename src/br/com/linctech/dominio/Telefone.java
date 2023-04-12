@@ -1,8 +1,11 @@
 package br.com.linctech.dominio;
 
+import java.io.Serializable;
+
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
-public class Telefone {
+public class Telefone implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String numeroTelefone;
 
     public Telefone() {
@@ -12,7 +15,7 @@ public class Telefone {
         this.setTelefone(numeroTelefone);
     }
 
-    public String getTelefone(String numeroTelefone) {
+    public String getTelefone() {
         return numeroTelefone;
     }
 
