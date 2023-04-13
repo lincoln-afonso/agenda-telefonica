@@ -1,7 +1,7 @@
 package br.com.linctech.dominio;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Set;
 
 public class Agenda implements Serializable {
@@ -9,7 +9,7 @@ public class Agenda implements Serializable {
     private Set<Pessoa> pessoas;
 
     public Agenda() {
-        this.pessoas = new HashSet<>();
+        this.pessoas = new TreeSet<>();
     }
 
     public Set<Pessoa> getPessoas() {

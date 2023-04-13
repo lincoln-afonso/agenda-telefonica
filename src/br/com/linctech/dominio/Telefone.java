@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
-public class Telefone implements Serializable {
+public class Telefone implements Serializable, Comparable<Telefone> {
     private static final long serialVersionUID = 1L;
     private String numeroTelefone;
 
@@ -53,5 +53,10 @@ public class Telefone implements Serializable {
         } else if (!numeroTelefone.equals(other.numeroTelefone))
             return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(Telefone telefone) {
+        return this.getTelefone().compareToIgnoreCase(telefone.getTelefone());
     }
 }

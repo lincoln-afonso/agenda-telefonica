@@ -4,38 +4,43 @@ import java.io.Serializable;
 
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
-public class Email implements Serializable {
+public class Email implements Serializable, Comparable<Email> {
     private static final long serialVersionUID = 1L;
-    private String enderecoEletronino;
+    private String enderecoEletronico;
 
     public Email() {
     }
 
     public Email(String endecoEletronico) throws DadoNaoInformadoException {
-        this.setEnderecoEletronino(enderecoEletronino);
+        this.setEnderecoEletronico(enderecoEletronico);
     }
 
-    public String getEnderecoEletronino() {
-        return enderecoEletronino;
+    public String getEnderecoEletronico() {
+        return enderecoEletronico;
     }
 
-    public void setEnderecoEletronino(String enderecoEletronino) throws DadoNaoInformadoException {
+    public void setEnderecoEletronico(String enderecoEletronino) throws DadoNaoInformadoException {
         if (enderecoEletronino.isEmpty())
             throw new DadoNaoInformadoException("Email não informado!");
 
-        this.enderecoEletronino = enderecoEletronino.toLowerCase();
+        this.enderecoEletronico = enderecoEletronino.toLowerCase();
     }
 
     @Override
     public String toString() {
-        return "Email [enderecoEletronino=" + enderecoEletronino + "]\n";
+        return "Email [enderecoEletronico=" + enderecoEletronico + "]\n";
+    }
+
+    @Override
+    public int compareTo(Email email) {
+        return this.getEnderecoEletronico().compareToIgnoreCase(email.getEnderecoEletronico());
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((enderecoEletronino == null) ? 0 : enderecoEletronino.hashCode());
+        result = prime * result + ((enderecoEletronico == null) ? 0 : enderecoEletronico.hashCode());
         return result;
     }
 
@@ -48,10 +53,10 @@ public class Email implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         Email other = (Email) obj;
-        if (enderecoEletronino == null) {
-            if (other.enderecoEletronino != null)
+        if (enderecoEletronico == null) {
+            if (other.enderecoEletronico != null)
                 return false;
-        } else if (!enderecoEletronino.equals(other.enderecoEletronino))
+        } else if (!enderecoEletronico.equals(other.enderecoEletronico))
             return false;
         return true;
     }

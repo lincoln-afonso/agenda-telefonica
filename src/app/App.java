@@ -1,6 +1,5 @@
 package app;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
@@ -62,11 +61,19 @@ public class App implements InclusaoDeDados {
                 break;
 
             case "2":
-
+                if (app.cadastrarTelefone(agenda)) {
+                    System.out.println("Telfone cadastrado!\n");
+                    Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                } else
+                    System.out.println("Telefone não cadastrado!\n");
                 break;
 
             case "3":
-
+                if (app.cadastrarEmail(agenda)) {
+                    System.out.println("Email cadastrado!\n");
+                    Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                } else
+                    System.out.println("Email não cadastrado!\n");
                 break;
 
             case "4":
@@ -82,7 +89,12 @@ public class App implements InclusaoDeDados {
                 break;
 
             case "7":
-                System.out.println(agenda);
+                break;
+
+            case "9":
+                for (Pessoa p : agenda.getPessoas()) {
+                    System.out.println(p + "" + p.getTelefones() + "" + p.getEmails() + "\n");
+                }
                 break;
 
             case "8":
@@ -115,7 +127,6 @@ public class App implements InclusaoDeDados {
                 System.out.print("Informe o nome: ");
                 nome = this.getLeia().nextLine();
                 pessoa.setNome(nome);
-
                 return pessoas.add(pessoa);
             } catch (DadoInvalidoException e) {
                 System.out.println();
@@ -128,11 +139,87 @@ public class App implements InclusaoDeDados {
 
     @Override
     public boolean cadastrarTelefone(Agenda agenda) {
+        String nome;
+        String numeroTelefone;
+        Telefone telefone = new Telefone();
+        Pessoa pessoa = new Pessoa();
+        Set<Pessoa> pessoas = agenda.getPessoas();
+        boolean eValido;
+
+        do {
+            eValido = false;
+            try {
+                System.out.print("Informe o nome da pessoa: ");
+                nome = this.getLeia().nextLine();
+                pessoa.setNome(nome);
+
+                pessoa = this.pesquisarNome(pessoas, nome);
+
+                eValido = true;
+            } catch (DadoNaoInformadoException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (eValido == false);
+
+        if (pessoa != null) {
+            eValido = false;
+            do {
+                try {
+                    System.out.print("Informe o  número de telefone: ");
+                    numeroTelefone = this.getLeia().nextLine();
+                    telefone.setTelefone(numeroTelefone);
+
+                    eValido = true;
+                } catch (DadoNaoInformadoException e) {
+                    System.out.println(e.getMessage());
+                }
+            } while (eValido == false);
+            return pessoa.getTelefones().add(telefone);
+        } else
+            System.out.println("Nome não encontrado!");
         return false;
     }
 
     @Override
     public boolean cadastrarEmail(Agenda agenda) {
+        String enderecoEletronico;
+        String nome;
+        Email email = new Email();
+        Pessoa pessoa = new Pessoa();
+        Set<Pessoa> pessoas = agenda.getPessoas();
+        boolean eValido;
+
+        do {
+            eValido = false;
+            try {
+                System.out.print("Informe o nome da pessoa: ");
+                nome = this.getLeia().nextLine();
+                pessoa.setNome(nome);
+
+                pessoa = this.pesquisarNome(pessoas, nome);
+                eValido = true;
+            } catch (DadoNaoInformadoException e) {
+                System.out.println(e.getMessage());
+            }
+
+        } while (eValido == false);
+
+        if (pessoa != null) {
+            eValido = false;
+            do {
+                System.out.print("Informe o email: ");
+                enderecoEletronico = this.getLeia().nextLine();
+                try {
+                    email.setEnderecoEletronico(enderecoEletronico);
+                    eValido = true;
+                } catch (DadoNaoInformadoException e) {
+                    System.out.println(e.getMessage());
+                }
+            } while (eValido == false);
+            System.out.println(email);
+            return pessoa.getEmails().add(email);
+        } else
+            System.out.println("Nome não encontrado!");
         return false;
     }
 
@@ -156,7 +243,7 @@ public class App implements InclusaoDeDados {
         Iterator<Email> e = emails.iterator();
         while (e.hasNext()) {
             em = e.next();
-            if (em.getEnderecoEletronino().equalsIgnoreCase(email))
+            if (em.getEnderecoEletronico().equalsIgnoreCase(email))
                 return em;
         }
         return null;

@@ -1,12 +1,13 @@
 package br.com.linctech.dominio;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
-public class Pessoa implements Serializable {
+public class Pessoa implements Serializable, Comparable<Pessoa> {
     private static final long serialVersionUID = 1L;
     private int id;
     private String nome;
@@ -17,6 +18,8 @@ public class Pessoa implements Serializable {
     };
 
     public Pessoa(int id) throws DadoInvalidoException {
+        this.telefones = new HashSet<>();
+        this.emails = new HashSet<>();
         this.setId(id);
     }
 
@@ -63,7 +66,6 @@ public class Pessoa implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + id;
         result = prime * result + ((nome == null) ? 0 : nome.hashCode());
         return result;
     }
@@ -77,8 +79,6 @@ public class Pessoa implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         Pessoa other = (Pessoa) obj;
-        if (id != other.id)
-            return false;
         if (nome == null) {
             if (other.nome != null)
                 return false;
@@ -86,4 +86,10 @@ public class Pessoa implements Serializable {
             return false;
         return true;
     }
+
+    @Override
+    public int compareTo(Pessoa pessoa) {
+        return this.getNome().compareToIgnoreCase(pessoa.getNome());
+    }
+
 }
