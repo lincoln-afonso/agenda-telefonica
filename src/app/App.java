@@ -94,11 +94,27 @@ public class App implements InclusaoDeDados {
                 break;
 
             case "5":
-
+                try {
+                    if (app.excluirPessoa(agenda)) {
+                        Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                        System.out.println("Pessoa/contato excluído com sucesso!\n");
+                    } else
+                        System.out.println("Não foi possível excluir a pessoa/contato!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "6":
-
+                try {
+                    if (app.excluirTelefone(agenda)) {
+                        Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                        System.out.println("Telefone excluído com sucesso!\n");
+                    } else
+                        System.out.println("Não foi possível excluir o número de telefone!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "7":
@@ -110,12 +126,6 @@ public class App implements InclusaoDeDados {
                         System.out.println("Não foi possível excluir email!\n");
                 } catch (ColecaoVaziaException e) {
                     System.out.println(e.getMessage() + "\n");
-                }
-                break;
-
-            case "9":
-                for (Pessoa p : agenda.getPessoas()) {
-                    System.out.println(p + "" + p.getTelefones() + "" + p.getEmails() + "\n");
                 }
                 break;
 
@@ -314,6 +324,20 @@ public class App implements InclusaoDeDados {
 
     @Override
     public boolean excluirPessoa(Agenda agenda) throws ColecaoVaziaException {
+        Pessoa pessoa = new Pessoa();
+        String nome;
+        Set<Pessoa> pessoas = agenda.getPessoas();
+
+        if (pessoas.size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
+
+        nome = this.lerNome(pessoas);
+
+        pessoa = this.pesquisarNome(pessoas, nome);
+        if (pessoa != null)
+            return pessoas.remove(pessoa);
+        else
+            System.out.println("Não há pessoas cadastradas com o nome informado!");
         return false;
     }
 
@@ -339,7 +363,20 @@ public class App implements InclusaoDeDados {
             do {
                 System.out.print("Informe o número do telefone a ser excluído: ");
                 numeroTelefone = this.getLeia().nextLine();
+                try {
+                    telefone.setTelefone(numeroTelefone);
+                    telefone = this.pesquisarTelefone(pessoa.getTelefones(), numeroTelefone);
 
+                    if (telefone != null)
+                        return pessoa.getTelefones().remove(telefone);
+                    else
+                        System.out.println(
+                                pessoa.getNome() + " não possui o telefone " + numeroTelefone + " cadastrado!");
+
+                    eValido = true;
+                } catch (DadoNaoInformadoException e) {
+                    System.out.println(e.getMessage());
+                }
             } while (eValido == false);
         } else
             System.out.println("Não há ninguém cadastrado com o nome informado!");
