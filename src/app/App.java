@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 
+import br.com.linctech.auxiliar.ColecaoVaziaException;
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 import br.com.linctech.auxiliar.InicializacaoArquivo;
@@ -40,7 +41,7 @@ public class App implements InclusaoDeDados {
         return leia;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         InicializacaoArquivo inicializa = new InicializacaoArquivo("agenda_telefonica");
         Agenda agenda;
         App app = new App();
@@ -61,23 +62,35 @@ public class App implements InclusaoDeDados {
                 break;
 
             case "2":
-                if (app.cadastrarTelefone(agenda)) {
-                    System.out.println("Telfone cadastrado!\n");
-                    Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
-                } else
-                    System.out.println("Telefone não cadastrado!\n");
+                try {
+                    if (app.cadastrarTelefone(agenda)) {
+                        System.out.println("Telfone cadastrado!\n");
+                        Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                    } else
+                        System.out.println("Telefone não cadastrado!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "3":
-                if (app.cadastrarEmail(agenda)) {
-                    System.out.println("Email cadastrado!\n");
-                    Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
-                } else
-                    System.out.println("Email não cadastrado!\n");
+                try {
+                    if (app.cadastrarEmail(agenda)) {
+                        System.out.println("Email cadastrado!\n");
+                        Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                    } else
+                        System.out.println("Email não cadastrado!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "4":
-
+                try {
+                    app.consultarDados(agenda);
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "5":
@@ -89,6 +102,15 @@ public class App implements InclusaoDeDados {
                 break;
 
             case "7":
+                try {
+                    if (app.excluirEmail(agenda)) {
+                        Serializador.gravar(agenda, inicializa.getFileAgenda().getName());
+                        System.out.println("Email excluído com sucesso!\n");
+                    } else
+                        System.out.println("Não foi possível excluir email!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage() + "\n");
+                }
                 break;
 
             case "9":
@@ -123,9 +145,7 @@ public class App implements InclusaoDeDados {
                 pessoa = new Pessoa(pessoas.size() + 1);
 
                 System.out.println("ID: " + pessoa.getId());
-
-                System.out.print("Informe o nome: ");
-                nome = this.getLeia().nextLine();
+                nome = this.lerNome(pessoas);
                 pessoa.setNome(nome);
                 return pessoas.add(pessoa);
             } catch (DadoInvalidoException e) {
@@ -138,7 +158,7 @@ public class App implements InclusaoDeDados {
     }
 
     @Override
-    public boolean cadastrarTelefone(Agenda agenda) {
+    public boolean cadastrarTelefone(Agenda agenda) throws ColecaoVaziaException {
         String nome;
         String numeroTelefone;
         Telefone telefone = new Telefone();
@@ -146,21 +166,12 @@ public class App implements InclusaoDeDados {
         Set<Pessoa> pessoas = agenda.getPessoas();
         boolean eValido;
 
-        do {
-            eValido = false;
-            try {
-                System.out.print("Informe o nome da pessoa: ");
-                nome = this.getLeia().nextLine();
-                pessoa.setNome(nome);
+        if (pessoas.size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
 
-                pessoa = this.pesquisarNome(pessoas, nome);
+        nome = this.lerNome(pessoas);
 
-                eValido = true;
-            } catch (DadoNaoInformadoException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (eValido == false);
-
+        pessoa = this.pesquisarNome(pessoas, nome);
         if (pessoa != null) {
             eValido = false;
             do {
@@ -181,7 +192,7 @@ public class App implements InclusaoDeDados {
     }
 
     @Override
-    public boolean cadastrarEmail(Agenda agenda) {
+    public boolean cadastrarEmail(Agenda agenda) throws ColecaoVaziaException {
         String enderecoEletronico;
         String nome;
         Email email = new Email();
@@ -189,21 +200,12 @@ public class App implements InclusaoDeDados {
         Set<Pessoa> pessoas = agenda.getPessoas();
         boolean eValido;
 
-        do {
-            eValido = false;
-            try {
-                System.out.print("Informe o nome da pessoa: ");
-                nome = this.getLeia().nextLine();
-                pessoa.setNome(nome);
+        if (pessoas.size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
 
-                pessoa = this.pesquisarNome(pessoas, nome);
-                eValido = true;
-            } catch (DadoNaoInformadoException e) {
-                System.out.println(e.getMessage());
-            }
+        nome = this.lerNome(pessoas);
 
-        } while (eValido == false);
-
+        pessoa = this.pesquisarNome(pessoas, nome);
         if (pessoa != null) {
             eValido = false;
             do {
@@ -262,23 +264,148 @@ public class App implements InclusaoDeDados {
         return null;
     }
 
+    public void listarTelefones(Set<Telefone> telefones) {
+        Telefone numeroTelefone;
+
+        if (telefones.size() > 0)
+            System.out.println("Telefone(s)");
+
+        Iterator<Telefone> tel = telefones.iterator();
+        while (tel.hasNext()) {
+            numeroTelefone = tel.next();
+            System.out.println(numeroTelefone.getTelefone());
+        }
+        System.out.println();
+    }
+
+    public void listarEmails(Set<Email> emails) {
+        Email enderecoEletronico;
+
+        if (emails.size() > 0)
+            System.out.println("Email(s)");
+
+        Iterator<Email> em = emails.iterator();
+        while (em.hasNext()) {
+            enderecoEletronico = em.next();
+            System.out.println(enderecoEletronico.getEnderecoEletronico());
+        }
+        System.out.println();
+    }
+
     @Override
-    public boolean consultarDados(Agenda agenda) {
+    public void consultarDados(Agenda agenda) throws ColecaoVaziaException {
+        String nome;
+        Pessoa pessoa = new Pessoa();
+        Set<Pessoa> pessoas = agenda.getPessoas();
+
+        if (pessoas.size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
+
+        nome = this.lerNome(pessoas);
+
+        pessoa = this.pesquisarNome(pessoas, nome);
+        if (pessoa != null) {
+            System.out.println("Nome: " + pessoa.getNome());
+            this.listarTelefones(pessoa.getTelefones());
+            this.listarEmails(pessoa.getEmails());
+        } else
+            System.out.println("Não há pessoas cadastradas com o nome " + nome + "!\n");
+    }
+
+    @Override
+    public boolean excluirPessoa(Agenda agenda) throws ColecaoVaziaException {
         return false;
     }
 
     @Override
-    public boolean excluirPessoa(Agenda agenda) {
+    public boolean excluirTelefone(Agenda agenda) throws ColecaoVaziaException {
+        String nome;
+        String numeroTelefone;
+        Pessoa pessoa;
+        Telefone telefone = new Telefone();
+        boolean eValido;
+
+        if (agenda.getPessoas().size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
+
+        nome = this.lerNome(agenda.getPessoas());
+
+        pessoa = this.pesquisarNome(agenda.getPessoas(), nome);
+        if (pessoa != null) {
+            if (pessoa.getTelefones().size() == 0)
+                throw new ColecaoVaziaException("A pessoa informada não possui telefones cadastrados!");
+
+            eValido = false;
+            do {
+                System.out.print("Informe o número do telefone a ser excluído: ");
+                numeroTelefone = this.getLeia().nextLine();
+
+            } while (eValido == false);
+        } else
+            System.out.println("Não há ninguém cadastrado com o nome informado!");
         return false;
     }
 
     @Override
-    public boolean excluirTelefone(Agenda agenda) {
+    public boolean excluirEmail(Agenda agenda) throws ColecaoVaziaException {
+        String enderecoEletronico;
+        String nome;
+        Pessoa pessoa = new Pessoa();
+        Email email = new Email();
+        boolean eValido;
+
+        if (agenda.getPessoas().size() == 0)
+            throw new ColecaoVaziaException("Não há pessoas cadastradas!");
+
+        nome = this.lerNome(agenda.getPessoas());
+
+        pessoa = this.pesquisarNome(agenda.getPessoas(), nome);
+        if (pessoa != null) {
+            if (pessoa.getEmails().size() == 0)
+                throw new ColecaoVaziaException("A pessoa informada não possui emails cadastrados!");
+
+            do {
+                eValido = false;
+                System.out.print("Informe o email a ser excluído: ");
+                enderecoEletronico = this.getLeia().nextLine();
+
+                try {
+                    email.setEnderecoEletronico(enderecoEletronico);
+                    email = this.pesquisarEmail(pessoa.getEmails(), enderecoEletronico);
+
+                    if (email != null)
+                        return pessoa.getEmails().remove(email);
+                    else
+                        System.out.println(
+                                pessoa.getNome() + " não possui o email " + enderecoEletronico + " cadastrado!");
+                    eValido = true;
+                } catch (DadoNaoInformadoException e) {
+                    System.out.println(e.getMessage());
+                }
+            } while (eValido == false);
+        } else
+            System.out.println("Não há ninguém cadastrado com o nome informado!");
         return false;
     }
 
-    @Override
-    public boolean excluirEmail(Agenda agenda) {
-        return false;
+    public String lerNome(Set<Pessoa> pessoas) {
+        String nome;
+        boolean eValido;
+
+        do {
+            eValido = false;
+            System.out.print("Informe o nome da pessoa: ");
+            nome = this.getLeia().nextLine();
+
+            try {
+                if (nome.isEmpty())
+                    throw new DadoNaoInformadoException("Nome não informado!");
+
+                eValido = true;
+            } catch (DadoNaoInformadoException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (eValido == false);
+        return nome;
     }
 }

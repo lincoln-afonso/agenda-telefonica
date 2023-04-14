@@ -19,11 +19,11 @@ public class Email implements Serializable, Comparable<Email> {
         return enderecoEletronico;
     }
 
-    public void setEnderecoEletronico(String enderecoEletronino) throws DadoNaoInformadoException {
-        if (enderecoEletronino.isEmpty())
+    public void setEnderecoEletronico(String enderecoEletronico) throws DadoNaoInformadoException {
+        if (enderecoEletronico.isEmpty())
             throw new DadoNaoInformadoException("Email não informado!");
 
-        this.enderecoEletronico = enderecoEletronino.toLowerCase();
+        this.enderecoEletronico = enderecoEletronico.toLowerCase();
     }
 
     @Override
